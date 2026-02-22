@@ -10,12 +10,22 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 #include <vector>
 #include <cstring>
 
 using namespace std;
 
-int svanipp::run_sender(const string& ip, uint16_t port, const string& filePath) {
+static string truncate_middle(const string& s, size_t maxLen) {
+    if (s.size() <= maxLen) return s;
+    if (maxLen <= 3) return s.substr(0, maxLen);
+    size_t keepFront = (maxLen - 3) / 2;
+    size_t keepBack  = maxLen - 3 - keepFront;
+    return s.substr(0, keepFront) + "..." + s.substr(s.size() - keepBack);
+}
+
+int svanipp::run_sender(const string& ip, uint16_t port, const string& filePath, const string& relPath) {
     namespace fs = filesystem;
 
     fs::path p(filePath);
@@ -24,7 +34,8 @@ int svanipp::run_sender(const string& ip, uint16_t port, const string& filePath)
         return 1;
     }
 
-    const string filename = p.filename().string();
+    // Use relPath for transfer
+    const string filename = relPath;
     const uint64_t fileSize = static_cast<uint64_t>(fs::file_size(p));
 
     ifstream in(filePath, ios::binary);
@@ -76,6 +87,11 @@ int svanipp::run_sender(const string& ip, uint16_t port, const string& filePath)
     const size_t BUF = 64 * 1024;
     vector<char> buf(BUF);
 
+    // Print filename once at start
+    string displayName = truncate_middle(filename, 32);
+    cout << "Sending " << displayName << "\n";
+    cout.flush();
+
     uint64_t sent = 0;
     while (in) {
         in.read(buf.data(), static_cast<streamsize>(BUF));
@@ -92,7 +108,10 @@ int svanipp::run_sender(const string& ip, uint16_t port, const string& filePath)
         sent += static_cast<uint64_t>(n);
         if (fileSize > 0) {
             int pct = static_cast<int>((sent * 100ULL) / fileSize);
-            cout << "\rSending " << filename << " ... " << pct << "%";
+            ostringstream oss;
+            oss << "  " << pct << "%";
+            string msg = oss.str();
+            cout << "\r" << msg;
             cout.flush();
         }
     }
@@ -106,7 +125,9 @@ int svanipp::run_sender(const string& ip, uint16_t port, const string& filePath)
         return 1;
     }
 
-    cout << "\nSent: " << filename << " (" << sent << " bytes)\n";
+    double mb = sent / (1024.0 * 1024.0);
+    cout << "\r";  // clear progress line
+    cout << "Sent: " << filename << " (" << fixed << setprecision(2) << mb << " MB)\n";
     closesocket(sock);
     return (sent == fileSize) ? 0 : 2;
 }
