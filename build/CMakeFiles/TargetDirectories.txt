@@ -1,3 +1,0 @@
-C:/Users/Gabriel/Desktop/Projects/Svanipp/build/CMakeFiles/svanipp.dir
-C:/Users/Gabriel/Desktop/Projects/Svanipp/build/CMakeFiles/edit_cache.dir
-C:/Users/Gabriel/Desktop/Projects/Svanipp/build/CMakeFiles/rebuild_cache.dir
