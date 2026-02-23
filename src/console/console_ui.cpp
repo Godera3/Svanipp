@@ -1,4 +1,5 @@
 #include "console/console_ui.h"
+#include "console/tui.h"
 
 #include <iostream>
 #include <sstream>
@@ -64,11 +65,17 @@ void ConsoleUI::set_throttle_ms(int ms) {
 }
 
 void ConsoleUI::log(Style style, const string& message) {
+    if (svanipp::console::TuiManager::instance().enabled()) {
+        return;
+    }
     clear_progress(true);
     cout << style_prefix(style) << message << "\n";
 }
 
 void ConsoleUI::print_block(const vector<string>& lines) {
+    if (svanipp::console::TuiManager::instance().enabled()) {
+        return;
+    }
     clear_progress(true);
     for (const auto& line : lines) {
         cout << line << "\n";
@@ -76,6 +83,9 @@ void ConsoleUI::print_block(const vector<string>& lines) {
 }
 
 void ConsoleUI::progress_update(const string& line, int pct) {
+    if (svanipp::console::TuiManager::instance().enabled()) {
+        return;
+    }
     if (!should_update(pct)) return;
     progressActive_ = true;
     cout << '\r' << line;
@@ -87,6 +97,9 @@ void ConsoleUI::progress_update(const string& line, int pct) {
 }
 
 void ConsoleUI::progress_end(bool newline) {
+    if (svanipp::console::TuiManager::instance().enabled()) {
+        return;
+    }
     clear_progress(newline);
 }
 

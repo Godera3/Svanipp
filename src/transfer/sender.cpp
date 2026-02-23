@@ -3,6 +3,7 @@
 #include "net/socket_utils.h"
 #include "crypto/sha256.h"
 #include "console/console_ui.h"
+#include "console/tui.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <winsock2.h>
@@ -167,6 +168,7 @@ int svanipp::run_sender(const string& ip,
     bytesSent = 0;
     error.clear();
     auto& ui = svanipp::console::ConsoleUI::instance();
+    auto& tui = svanipp::console::TuiManager::instance();
 
     const int connectTimeoutMs = clamp_timeout_ms(connectTimeoutSec);
     const int ioTimeoutMs = clamp_timeout_ms(ioTimeoutSec);
@@ -182,6 +184,10 @@ int svanipp::run_sender(const string& ip,
 
     const string filename = relPath;
     const uint64_t fileSize = static_cast<uint64_t>(fs::file_size(p));
+    const double fileSizeMb = fileSize / (1024.0 * 1024.0);
+    if (tui.enabled()) {
+        tui.ensure_transfer(filename, fileSizeMb);
+    }
 
     ifstream in(p, ios::binary);
     if (!in) {
@@ -197,6 +203,10 @@ int svanipp::run_sender(const string& ip,
                    "Retrying " + filename + " (attempt " + to_string(attempt + 1) + "/" +
                    to_string(maxAttempts) + ") after " + to_string(backoffMs) + " ms");
             this_thread::sleep_for(chrono::milliseconds(backoffMs));
+        }
+
+        if (tui.enabled()) {
+            tui.update_transfer_by_path(filename, "SENDING", 0, 0.0, -1, 0.0, fileSizeMb);
         }
 
         in.clear();
@@ -289,6 +299,10 @@ int svanipp::run_sender(const string& ip,
                 int eta = (bps > 0.0) ? static_cast<int>((fileSize - sent) / bps) : -1;
                 string line = ui.make_status_line("Send", filename, pct, mbps, eta);
                 ui.progress_update(line, pct);
+                if (tui.enabled()) {
+                    tui.update_transfer_by_path(filename, "SENDING", pct, mbps, eta,
+                                                sent / (1024.0 * 1024.0), fileSizeMb);
+                }
             }
         }
 
@@ -307,6 +321,9 @@ int svanipp::run_sender(const string& ip,
             ui.progress_end(true);
             if (error.empty()) error = "connection lost";
             ui.log(svanipp::console::Style::Fail, "Send failed: " + filename + " (" + error + ")");
+            if (tui.enabled()) {
+                tui.mark_done_by_path(filename, "FAIL", sent / (1024.0 * 1024.0), fileSizeMb);
+            }
             closesocket(sock);
             bytesSent = sent;
             if (attempt + 1 < maxAttempts && is_retryable_error(error)) continue;
@@ -320,6 +337,9 @@ int svanipp::run_sender(const string& ip,
         okMsg << "Sent " << filename << " (" << fixed << setprecision(2) << mb << " MB, "
               << fixed << setprecision(2) << elapsed << " s)";
         ui.log(svanipp::console::Style::Ok, okMsg.str());
+        if (tui.enabled()) {
+            tui.mark_done_by_path(filename, "OK", sent / (1024.0 * 1024.0), fileSizeMb);
+        }
         closesocket(sock);
         bytesSent = sent;
         return 0;

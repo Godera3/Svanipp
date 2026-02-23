@@ -9,6 +9,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "C:/Users/Gabriel/Desktop/Projects/Svanipp/src/console/console_ui.cpp" "CMakeFiles/svanipp.dir/src/console/console_ui.cpp.obj" "gcc" "CMakeFiles/svanipp.dir/src/console/console_ui.cpp.obj.d"
+  "C:/Users/Gabriel/Desktop/Projects/Svanipp/src/console/tui.cpp" "CMakeFiles/svanipp.dir/src/console/tui.cpp.obj" "gcc" "CMakeFiles/svanipp.dir/src/console/tui.cpp.obj.d"
   "C:/Users/Gabriel/Desktop/Projects/Svanipp/src/crypto/sha256.cpp" "CMakeFiles/svanipp.dir/src/crypto/sha256.cpp.obj" "gcc" "CMakeFiles/svanipp.dir/src/crypto/sha256.cpp.obj.d"
   "C:/Users/Gabriel/Desktop/Projects/Svanipp/src/discovery/discovery.cpp" "CMakeFiles/svanipp.dir/src/discovery/discovery.cpp.obj" "gcc" "CMakeFiles/svanipp.dir/src/discovery/discovery.cpp.obj.d"
   "C:/Users/Gabriel/Desktop/Projects/Svanipp/src/main.cpp" "CMakeFiles/svanipp.dir/src/main.cpp.obj" "gcc" "CMakeFiles/svanipp.dir/src/main.cpp.obj.d"

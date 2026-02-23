@@ -152,6 +152,30 @@ src/console/console_ui.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\svanipp.dir\build.make CMakeFiles/svanipp.dir/src/console/console_ui.cpp.s
 .PHONY : src/console/console_ui.cpp.s
 
+src/console/tui.obj: src/console/tui.cpp.obj
+.PHONY : src/console/tui.obj
+
+# target to build an object file
+src/console/tui.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\svanipp.dir\build.make CMakeFiles/svanipp.dir/src/console/tui.cpp.obj
+.PHONY : src/console/tui.cpp.obj
+
+src/console/tui.i: src/console/tui.cpp.i
+.PHONY : src/console/tui.i
+
+# target to preprocess a source file
+src/console/tui.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\svanipp.dir\build.make CMakeFiles/svanipp.dir/src/console/tui.cpp.i
+.PHONY : src/console/tui.cpp.i
+
+src/console/tui.s: src/console/tui.cpp.s
+.PHONY : src/console/tui.s
+
+# target to generate assembly for a file
+src/console/tui.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\svanipp.dir\build.make CMakeFiles/svanipp.dir/src/console/tui.cpp.s
+.PHONY : src/console/tui.cpp.s
+
 src/crypto/sha256.obj: src/crypto/sha256.cpp.obj
 .PHONY : src/crypto/sha256.obj
 
@@ -332,6 +356,9 @@ help:
 	@echo ... src/console/console_ui.obj
 	@echo ... src/console/console_ui.i
 	@echo ... src/console/console_ui.s
+	@echo ... src/console/tui.obj
+	@echo ... src/console/tui.i
+	@echo ... src/console/tui.s
 	@echo ... src/crypto/sha256.obj
 	@echo ... src/crypto/sha256.i
 	@echo ... src/crypto/sha256.s

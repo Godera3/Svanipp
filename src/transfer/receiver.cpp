@@ -3,6 +3,7 @@
 #include "net/socket_utils.h"
 #include "crypto/sha256.h"
 #include "console/console_ui.h"
+#include "console/tui.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <winsock2.h>
@@ -189,6 +190,7 @@ int svanipp::run_receiver(uint16_t port,
 
     cout << "Listening on 0.0.0.0:" << port << ", saving to " << outPath.string() << "\n";
     auto& ui = svanipp::console::ConsoleUI::instance();
+    auto& tui = svanipp::console::TuiManager::instance();
 
     uint64_t okFiles = 0;
     uint64_t okBytes = 0;
@@ -244,6 +246,11 @@ int svanipp::run_receiver(uint16_t port,
         }
         string relPath(nameBuf.begin(), nameBuf.end());
         attempted = true;
+        const double fileSizeMb = fileSize / (1024.0 * 1024.0);
+        if (tui.enabled()) {
+            tui.ensure_transfer(relPath, fileSizeMb);
+            tui.update_transfer_by_path(relPath, "RECEIVING", 0, 0.0, -1, 0.0, fileSizeMb);
+        }
         if (relPath.empty()) {
             ui.log(svanipp::console::Style::Fail, "Rejected unsafe path: " + relPath);
             closesocket(clientSock);
@@ -351,6 +358,9 @@ int svanipp::run_receiver(uint16_t port,
                 failed = true;
                 ui.progress_end(true);
                 ui.log(svanipp::console::Style::Fail, "Idle timeout while receiving: " + relPath);
+                if (tui.enabled()) {
+                    tui.mark_done_by_path(relPath, "FAIL", received / (1024.0 * 1024.0), fileSizeMb);
+                }
                 break;
             }
             if (sel < 0) {
@@ -358,6 +368,9 @@ int svanipp::run_receiver(uint16_t port,
                 failed = true;
                 ui.progress_end(true);
                 ui.log(svanipp::console::Style::Fail, "Receive failed: " + relPath);
+                if (tui.enabled()) {
+                    tui.mark_done_by_path(relPath, "FAIL", received / (1024.0 * 1024.0), fileSizeMb);
+                }
                 break;
             }
             int r = ::recv(clientSock, buf.data(), static_cast<int>(want), 0);
@@ -367,6 +380,9 @@ int svanipp::run_receiver(uint16_t port,
                 failed = true;
                 ui.progress_end(true);
                 ui.log(svanipp::console::Style::Fail, "Connection lost while receiving: " + relPath);
+                if (tui.enabled()) {
+                    tui.mark_done_by_path(relPath, "FAIL", received / (1024.0 * 1024.0), fileSizeMb);
+                }
                 break;
             }
             hasher.update(buf.data(), static_cast<size_t>(r));
@@ -384,6 +400,10 @@ int svanipp::run_receiver(uint16_t port,
                 int eta = (bps > 0.0) ? static_cast<int>((fileSize - received) / bps) : -1;
                 string line = ui.make_status_line("Recv", relPath, pct, mbps, eta);
                 ui.progress_update(line, pct);
+                if (tui.enabled()) {
+                    tui.update_transfer_by_path(relPath, "RECEIVING", pct, mbps, eta,
+                                                received / (1024.0 * 1024.0), fileSizeMb);
+                }
             }
         }
         ui.progress_end(true);
@@ -394,6 +414,9 @@ int svanipp::run_receiver(uint16_t port,
         if (!failed && received == fileSize) {
             if (!recv_exact_with_timeout(clientSock, gotDigest, sizeof(gotDigest), ioTimeoutMs, recvReason)) {
                 ui.log(svanipp::console::Style::Fail, "Digest " + recvReason + ": " + relPath);
+                if (tui.enabled()) {
+                    tui.mark_done_by_path(relPath, "FAIL", received / (1024.0 * 1024.0), fileSizeMb);
+                }
                 failed = true;
             }
 
@@ -402,6 +425,9 @@ int svanipp::run_receiver(uint16_t port,
 
             if (!failed && memcmp(gotDigest, calcDigest, 32) != 0) {
                 ui.log(svanipp::console::Style::Fail, "SHA-256 mismatch: " + relPath);
+                if (tui.enabled()) {
+                    tui.mark_done_by_path(relPath, "FAIL", received / (1024.0 * 1024.0), fileSizeMb);
+                }
                 failed = true;
             }
             if (!failed) success = true;
@@ -420,11 +446,21 @@ int svanipp::run_receiver(uint16_t port,
             okMsg << "Saved " << saveAs.u8string() << " (" << fixed << setprecision(2) << mb
                   << " MB, " << fixed << setprecision(2) << elapsed << " s)";
             ui.log(svanipp::console::Style::Ok, okMsg.str());
+            if (tui.enabled()) {
+                tui.mark_done_by_path(relPath, "OK", received / (1024.0 * 1024.0), fileSizeMb);
+            }
             okFiles++;
             okBytes += received;
         } else if (attempted) {
             ui.log(svanipp::console::Style::Fail, "Transfer failed: " + relPath);
+            if (tui.enabled()) {
+                tui.mark_done_by_path(relPath, "FAIL", received / (1024.0 * 1024.0), fileSizeMb);
+            }
             failedFiles++;
+        }
+
+        if (tui.enabled()) {
+            tui.set_stats(okFiles, failedFiles, okBytes);
         }
 
         if (summary) {

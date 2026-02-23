@@ -25,6 +25,12 @@
 },
 {
   "directory": "C:/Users/Gabriel/Desktop/Projects/Svanipp/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe  @CMakeFiles/svanipp.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\svanipp.dir\\src\\console\\tui.cpp.obj -c C:\\Users\\Gabriel\\Desktop\\Projects\\Svanipp\\src\\console\\tui.cpp",
+  "file": "C:/Users/Gabriel/Desktop/Projects/Svanipp/src/console/tui.cpp",
+  "output": "CMakeFiles/svanipp.dir/src/console/tui.cpp.obj"
+},
+{
+  "directory": "C:/Users/Gabriel/Desktop/Projects/Svanipp/build",
   "command": "C:\\msys64\\ucrt64\\bin\\g++.exe  @CMakeFiles/svanipp.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\svanipp.dir\\src\\transfer\\receiver.cpp.obj -c C:\\Users\\Gabriel\\Desktop\\Projects\\Svanipp\\src\\transfer\\receiver.cpp",
   "file": "C:/Users/Gabriel/Desktop/Projects/Svanipp/src/transfer/receiver.cpp",
   "output": "CMakeFiles/svanipp.dir/src/transfer/receiver.cpp.obj"

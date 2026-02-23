@@ -3,6 +3,7 @@
 #include "transfer/sender.h"
 #include "discovery/discovery.h"
 #include "console/console_ui.h"
+#include "console/tui.h"
 
 
 #include <cstdlib>
@@ -26,15 +27,16 @@ static void usage() {
         "    --overwrite: skip confirmation prompt on file collision (default: prompt user)\n"
         "    --summary: print cumulative totals after each file\n"
         "    --no-color: disable ANSI colors/icons\n"
+        "    --no-tui: force classic logs even in terminal\n"
     "    --io-timeout <sec>: header/digest timeout (default: 5)\n"
     "    --idle-timeout <sec>: transfer idle timeout (default: 15)\n"
-    "  svanipp send [--ip <ip> | --name <device>] [--no-color] <file1> [file2 ...]\n"
+    "  svanipp send [--ip <ip> | --name <device>] [--no-color] [--no-tui] <file1> [file2 ...]\n"
     "    --connect-timeout <sec>: connect timeout (default: 3)\n"
     "    --io-timeout <sec>: header/digest timeout (default: 5)\n"
     "    --idle-timeout <sec>: transfer idle timeout (default: 15)\n"
     "    --retries <n>: retry count for transient failures (default: 3)\n"
         "    without --ip/--name: interactive device selection\n"
-        "  svanipp discover [--no-color]\n";
+        "  svanipp discover [--no-color] [--no-tui]\n";
 }
 
 static bool argEq(const char* a, const char* b) {
@@ -59,6 +61,7 @@ int main(int argc, char** argv) {
         bool overwrite = false;
         bool summary = false;
         bool noColor = false;
+        bool noTui = false;
         int ioTimeoutSec = 5;
         int idleTimeoutSec = 15;
 
@@ -73,6 +76,8 @@ int main(int argc, char** argv) {
                 summary = true;
             } else if (argEq(argv[i], "--no-color")) {
                 noColor = true;
+            } else if (argEq(argv[i], "--no-tui")) {
+                noTui = true;
             } else if (argEq(argv[i], "--io-timeout") && i + 1 < argc) {
                 ioTimeoutSec = stoi(argv[++i]);
             } else if (argEq(argv[i], "--idle-timeout") && i + 1 < argc) {
@@ -84,6 +89,14 @@ int main(int argc, char** argv) {
         }
 
         svanipp::console::ConsoleUI::instance().init(noColor);
+        auto& tui = svanipp::console::TuiManager::instance();
+        tui.init(noTui, noColor);
+        if (tui.enabled()) {
+            tui.set_mode("RECEIVE");
+            tui.set_local("0.0.0.0", port);
+            tui.set_hint("Ctrl+C to stop receiver");
+            tui.start();
+        }
 
         string devName = "SvanippDevice";
         if (const char* cn = getenv("COMPUTERNAME")) devName = cn;
@@ -93,7 +106,9 @@ int main(int argc, char** argv) {
         }).detach();
 
 
-        return svanipp::run_receiver(port, outDir, overwrite, summary, ioTimeoutSec, idleTimeoutSec);
+        int rr = svanipp::run_receiver(port, outDir, overwrite, summary, ioTimeoutSec, idleTimeoutSec);
+        tui.stop();
+        return rr;
     }
 
     // ===== SEND =====
@@ -103,6 +118,7 @@ int main(int argc, char** argv) {
         uint16_t port = 39000;
         vector<string> files;
         bool noColor = false;
+        bool noTui = false;
         int connectTimeoutSec = 3;
         int ioTimeoutSec = 5;
         int idleTimeoutSec = 15;
@@ -117,6 +133,8 @@ int main(int argc, char** argv) {
                 port = static_cast<uint16_t>(stoi(argv[++i]));
             } else if (argEq(argv[i], "--no-color")) {
                 noColor = true;
+            } else if (argEq(argv[i], "--no-tui")) {
+                noTui = true;
             } else if (argEq(argv[i], "--connect-timeout") && i + 1 < argc) {
                 connectTimeoutSec = stoi(argv[++i]);
             } else if (argEq(argv[i], "--io-timeout") && i + 1 < argc) {
@@ -132,6 +150,8 @@ int main(int argc, char** argv) {
 
         auto& ui = svanipp::console::ConsoleUI::instance();
         ui.init(noColor);
+        auto& tui = svanipp::console::TuiManager::instance();
+        tui.init(noTui, noColor);
 
         if (files.empty()) {
             usage();
@@ -231,6 +251,16 @@ int main(int argc, char** argv) {
             ui.log(svanipp::console::Style::Warn, "No files to send.");
             return 1;
         }
+        if (tui.enabled()) {
+            tui.set_mode("SEND");
+            tui.set_local(ip.empty() ? "-" : ip, port);
+            tui.set_totals(sendList.size(), totalSize);
+            tui.set_hint("Ctrl+C to stop, Q to quit sender");
+            tui.start();
+            for (const auto& f : sendList) {
+                tui.ensure_transfer(f.relPath, 0.0);
+            }
+        }
         {
             ostringstream prep;
             prep << "Preparing to send " << sendList.size() << " files, total size "
@@ -250,6 +280,11 @@ int main(int argc, char** argv) {
         bool started = false;
         clock::time_point startTime{};
         for (const auto& f : sendList) {
+            if (tui.enabled() && tui.quit_requested()) {
+                failures.push_back({ f.relPath, "cancelled" });
+                result = 1;
+                continue;
+            }
             if (!started) {
                 startTime = clock::now();
                 started = true;
@@ -291,6 +326,9 @@ int main(int argc, char** argv) {
                     << fixed << setprecision(2) << attemptedMb << "/" << totalMb << " MB, "
                     << fixed << setprecision(1) << avgMbps << " MB/s, ETA " << eta << "s";
             ui.log(svanipp::console::Style::Info, overall.str());
+            if (tui.enabled()) {
+                tui.set_stats(successFiles, failures.size(), successBytes);
+            }
         }
 
         if (started) {
@@ -342,21 +380,27 @@ int main(int argc, char** argv) {
             }
         }
 
+        tui.stop();
+
         return result;
     }
 
     // ===== DISCOVER =====
     if (cmd == "discover") {
         bool noColor = false;
+        bool noTui = false;
         for (int i = 2; i < argc; ++i) {
             if (argEq(argv[i], "--no-color")) {
                 noColor = true;
+            } else if (argEq(argv[i], "--no-tui")) {
+                noTui = true;
             } else {
                 usage();
                 return 1;
             }
         }
         svanipp::console::ConsoleUI::instance().init(noColor);
+        svanipp::console::TuiManager::instance().init(noTui, noColor);
         auto devices = svanipp::discovery::run_scan(1500);
         if (devices.empty()) {
             cout << "No Svanipp devices found.\n";

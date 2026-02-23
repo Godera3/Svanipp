@@ -314,24 +314,9 @@ CMakeFiles/svanipp.dir/src/transfer/sender.cpp.obj: \
  C:/msys64/ucrt64/include/pthread_time.h \
  C:/msys64/ucrt64/include/pthread_compat.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/parse_numbers.h \
- C:/msys64/ucrt64/include/ws2tcpip.h C:/msys64/ucrt64/include/ws2ipdef.h \
- C:/msys64/ucrt64/include/in6addr.h \
- C:/msys64/ucrt64/include/psdk_inc/_ip_mreq1.h \
- C:/msys64/ucrt64/include/mstcpip.h \
- C:/msys64/ucrt64/include/c++/15.2.0/filesystem \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/fs_fwd.h \
- C:/msys64/ucrt64/include/c++/15.2.0/system_error \
- C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/error_constants.h \
- C:/msys64/ucrt64/include/c++/15.2.0/stdexcept \
- C:/msys64/ucrt64/include/c++/15.2.0/exception \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/exception_ptr.h \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/cxxabi_init_exception.h \
- C:/msys64/ucrt64/include/c++/15.2.0/typeinfo \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/nested_exception.h \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/fs_path.h \
- C:/msys64/ucrt64/include/c++/15.2.0/locale \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_classes.h \
- C:/msys64/ucrt64/include/c++/15.2.0/ext/atomicity.h \
+ C:/Users/Gabriel/Desktop/Projects/Svanipp/src/console/tui.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/mutex \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/std_mutex.h \
  C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/gthr.h \
  C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/gthr-default.h \
  C:/msys64/ucrt64/include/pthread.h C:/msys64/ucrt64/include/sys/types.h \
@@ -341,7 +326,30 @@ CMakeFiles/svanipp.dir/src/transfer/sender.cpp.obj: \
  C:/msys64/ucrt64/include/pthread_signal.h \
  C:/msys64/ucrt64/include/sched.h \
  C:/msys64/ucrt64/include/pthread_unistd.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/unique_lock.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/error_constants.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/ext/atomicity.h \
  C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/thread \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/std_thread.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/unique_ptr.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/this_thread_sleep.h \
+ C:/msys64/ucrt64/include/ws2tcpip.h C:/msys64/ucrt64/include/ws2ipdef.h \
+ C:/msys64/ucrt64/include/in6addr.h \
+ C:/msys64/ucrt64/include/psdk_inc/_ip_mreq1.h \
+ C:/msys64/ucrt64/include/mstcpip.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/filesystem \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/fs_fwd.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/system_error \
+ C:/msys64/ucrt64/include/c++/15.2.0/stdexcept \
+ C:/msys64/ucrt64/include/c++/15.2.0/exception \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/exception_ptr.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/cxxabi_init_exception.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/typeinfo \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/nested_exception.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/fs_path.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/locale \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_classes.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_classes.tcc \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_facets.h \
  C:/msys64/ucrt64/include/c++/15.2.0/cwctype \
@@ -376,7 +384,6 @@ CMakeFiles/svanipp.dir/src/transfer/sender.cpp.obj: \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/shared_ptr.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/shared_ptr_base.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/allocated_ptr.h \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/unique_ptr.h \
  C:/msys64/ucrt64/include/c++/15.2.0/ext/aligned_buffer.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/fs_dir.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/fs_ops.h \
@@ -386,9 +393,6 @@ CMakeFiles/svanipp.dir/src/transfer/sender.cpp.obj: \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/fstream.tcc \
  C:/msys64/ucrt64/include/c++/15.2.0/iostream \
  C:/msys64/ucrt64/include/c++/15.2.0/cstring \
- C:/msys64/ucrt64/include/c++/15.2.0/thread \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/std_thread.h \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/this_thread_sleep.h \
  C:/msys64/ucrt64/include/c++/15.2.0/algorithm \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_algo.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/algorithmfwd.h \
