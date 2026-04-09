@@ -55,6 +55,8 @@ build/svanipp.exe
 
 That is the program you will run.
 
+> If you use Visual Studio or the CMake Tools extension, the executable may appear in `out\build\x64-Debug\svanipp.exe` for debug builds. For the scripts in this repository, use `build\svanipp.exe`.
+
 ────────────────────────
 PART 3 — BASIC IDEA
 ────────────────────────

@@ -50,6 +50,8 @@ Set-ExecutionPolicy -Scope Process Bypass
 
 Note: the first install may take several minutes.
 
+> If you build using Visual Studio / CMake Tools instead of the repo scripts, the executable may appear under `out\build\x64-Debug\svanipp.exe`. For the scripted release flow, use `build\svanipp.exe`.
+
 ### Windows Setup
 
 1. Install MSYS2 (includes GCC compiler)
@@ -93,7 +95,7 @@ Set-ExecutionPolicy -Scope Process Bypass
 .\scripts\package-windows.ps1 -BuildType Release
 ```
 
-This script will build the project (if `build\svanipp.exe` is not already present), copy the executable to `dist\svanipp.exe` and create `dist\svanipp-windows.zip`. Distribute the `dist` folder contents to other users — they can run `svanipp.exe` directly with no build tools required.
+This script will build the project (if `build\svanipp.exe` is not already present), copy the executable to `dist\svanipp.exe` and create `dist\svanipp-windows.zip`. It also copies common MSYS2 runtime DLLs when available so the release zip is more portable.
 
 ## Usage
 
